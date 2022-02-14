@@ -1,59 +1,22 @@
 {
-  "name": "handlebars-wax",
-  "version": "7.0.0",
+  "name": "@fidian/handlebars-wax",
+  "version": "7.1.0",
   "description": "Effortless wiring of Handlebars data, partials, helpers, and decorators.",
   "main": "index.js",
   "files": [
     "*.js"
   ],
-  "scripts": {
-    "coveralls": "nyc report -r text-lcov | coveralls",
-    "test": "xo --fix && nyc ava -v"
-  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shannonmoeller/handlebars-wax.git"
+    "url": "https://github.com/fidian/handlebars-wax.git"
   },
-  "keywords": [
-    "handlebars",
-    "hbs",
-    "hb",
-    "html",
-    "glob",
-    "globby",
-    "register",
-    "data",
-    "partials",
-    "helpers",
-    "decorators"
-  ],
   "author": "Shannon Moeller <me@shannonmoeller.com> (http://shannonmoeller.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shannonmoeller/handlebars-wax/issues"
+    "url": "https://github.com/fidian/handlebars-wax/issues"
   },
-  "homepage": "https://github.com/shannonmoeller/handlebars-wax",
+  "homepage": "https://github.com/fidian/handlebars-wax",
   "dependencies": {
-    "require-glob": "^3.2.0"
-  },
-  "devDependencies": {
-    "ava": "^0.25.0",
-    "axios": "^0.18.0",
-    "coveralls": "^3.0.0",
-    "express": "^4.16.2",
-    "handlebars": "^4.0.11",
-    "nyc": "^11.4.1",
-    "portfinder": "^1.0.13",
-    "xo": "^0.20.3"
-  },
-  "xo": {
-    "rules": {
-      "ava/no-async-fn-without-await": 0,
-      "node/no-deprecated-api": 0,
-      "capitalized-comments": 0
-    }
-  },
-  "engines": {
-    "node": ">= 4"
+    "require-glob": "^4.0.0"
   }
 }

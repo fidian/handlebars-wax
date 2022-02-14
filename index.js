@@ -1,39 +1,17 @@
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const requireGlob = require('require-glob');
 
-const toString = Object.prototype.toString;
-
 const ESCAPE_CHARACTERS = /[-/\\^$*+?.()|[\]{}]/g;
 const NON_WORD_CHARACTERS = /\W+/g;
-const PATH_SEPARATOR = '/';
+const PATH_SEPARATOR = fs.sep;
 const PATH_SEPARATORS = /[\\/]/g;
 const WHITESPACE_CHARACTERS = /\s+/g;
 const WORD_SEPARATOR = '-';
-const TYPE_FUNCTION = 'fun';
-const TYPE_OBJECT = 'obj';
 
 // Utilities
 
-function escapeRx(str) {
-	return str.replace(ESCAPE_CHARACTERS, '\\$&');
-}
-
-function getTypeOf(value) {
-	return toString
-		.call(value)
-		.substr(8, 3)
-		.toLowerCase();
-}
-
 function hookRequire(handlebars, extensions) {
-	// istanbul ignore next
-	extensions = extensions || [];
-
-	let originalHooks; // eslint-disable-line prefer-const
-
 	function compileFile(module, filename) {
 		const templateString = fs.readFileSync(filename, 'utf8');
 
@@ -53,41 +31,40 @@ function hookRequire(handlebars, extensions) {
 	}
 
 	function unhookRequire() {
-		extensions.forEach(uncacheHook);
+		for (const extension of extensions) {
+			uncacheHook(extension);
+		}
 	}
 
-	// Hook
-	originalHooks = extensions.map(cacheHook);
+	extensions = extensions || [];
+	const originalHooks = extensions.map(cacheHook);
 
-	// Unhook
 	return unhookRequire;
 }
-
-// Map Reduce
 
 function keygenPartial(options, file) {
 	const resolvedFilePath = fs.realpathSync(file.path);
 	const resolvedFileBase = fs.realpathSync(file.base);
 
 	const fullPath = resolvedFilePath.replace(PATH_SEPARATORS, PATH_SEPARATOR);
-	const basePath =
-		resolvedFileBase.replace(PATH_SEPARATORS, PATH_SEPARATOR) +
-		PATH_SEPARATOR;
+	const basePath
+		= resolvedFileBase.replace(PATH_SEPARATORS, PATH_SEPARATOR)
+		+ PATH_SEPARATOR;
 	const shortPath = fullPath.replace(
-		new RegExp('^' + escapeRx(basePath), 'i'),
-		''
+		new RegExp('^' + string_.replace(ESCAPE_CHARACTERS, '\\$&'), 'i'),
+		'',
 	);
 	const extension = path.extname(shortPath);
 
 	return shortPath
-		.substr(0, shortPath.length - extension.length)
+		.slice(0, Math.max(0, shortPath.length - extension.length))
 		.replace(WHITESPACE_CHARACTERS, WORD_SEPARATOR);
 }
 
 function keygenHelper(options, file) {
 	return keygenPartial(options, file).replace(
 		NON_WORD_CHARACTERS,
-		WORD_SEPARATOR
+		WORD_SEPARATOR,
 	);
 }
 
@@ -95,30 +72,30 @@ function keygenDecorator(options, file) {
 	return keygenHelper(options, file);
 }
 
-function reducer(options, obj, fileObj) {
-	let value = fileObj.exports;
+function reducer(options, object, fileObject) {
+	let value = fileObject.exports;
 
 	if (!value) {
-		return obj;
+		return object;
 	}
 
-	if (getTypeOf(value.register) === TYPE_FUNCTION) {
+	if (typeof value.register === 'function') {
 		value = value.register(options.handlebars, options);
 
-		if (getTypeOf(value) === TYPE_OBJECT) {
-			return Object.assign(obj, value);
+		if (typeof value === 'object') {
+			return Object.assign(object, value);
 		}
 
-		return obj;
+		return object;
 	}
 
-	if (getTypeOf(value) === TYPE_OBJECT) {
-		return Object.assign(obj, value);
+	if (typeof value === 'object') {
+		return Object.assign(object, value);
 	}
 
-	obj[options.keygen(fileObj)] = value;
+	object[options.keygen(fileObject)] = value;
 
-	return obj;
+	return object;
 }
 
 function resolveValue(options, value) {
@@ -126,25 +103,22 @@ function resolveValue(options, value) {
 		return {};
 	}
 
-	if (getTypeOf(value) === TYPE_FUNCTION) {
+	if (typeof value === 'function') {
 		value = value(options.handlebars, options);
 
-		if (getTypeOf(value) === TYPE_OBJECT) {
+		if (typeof value === 'object') {
 			return value;
 		}
 
 		return {};
 	}
 
-	if (getTypeOf(value) === TYPE_OBJECT) {
+	if (typeof value === 'object') {
 		return reducer(options, {}, {exports: value});
 	}
 
 	return requireGlob.sync(value, options);
 }
-
-// Wax
-
 function HandlebarsWax(handlebars, options) {
 	const defaults = {
 		handlebars,
@@ -156,13 +130,12 @@ function HandlebarsWax(handlebars, options) {
 		parsePartialName: keygenPartial,
 		parseHelperName: keygenHelper,
 		parseDecoratorName: keygenDecorator,
-		parseDataName: null
+		parseDataName: null,
 	};
 
 	this.handlebars = handlebars;
 	this.config = Object.assign(defaults, options);
 	this.context = Object.create(null);
-
 	this.engine = this.engine.bind(this);
 }
 
@@ -210,12 +183,12 @@ HandlebarsWax.prototype.data = function (data, options) {
 };
 
 HandlebarsWax.prototype.compile = function (template, compileOptions) {
-	const config = this.config;
-	const context = this.context;
+	const {config} = this;
+	const {context} = this;
 
 	compileOptions = Object.assign({}, config.compileOptions, compileOptions);
 
-	if (getTypeOf(template) !== TYPE_FUNCTION) {
+	if (typeof template !== 'function') {
 		template = this.handlebars.compile(template, compileOptions);
 	}
 
@@ -223,57 +196,52 @@ HandlebarsWax.prototype.compile = function (template, compileOptions) {
 		templateOptions = Object.assign(
 			{},
 			config.templateOptions,
-			templateOptions
+			templateOptions,
 		);
 		templateOptions.data = Object.assign({}, templateOptions.data);
 
 		// {{@global.foo}} and {{@global._parent.foo}}
 		templateOptions.data.global = Object.assign(
 			{_parent: context},
-			templateOptions.data.global || context
+			templateOptions.data.global || context,
 		);
 
 		// {{@local.foo}} and {{@local._parent.foo}}
 		templateOptions.data.local = Object.assign(
 			{_parent: context},
-			templateOptions.data.local || data
+			templateOptions.data.local || data,
 		);
 
 		// {{foo}} and {{_parent.foo}}
 		return template(
 			Object.assign({_parent: context}, context, data),
-			templateOptions
+			templateOptions,
 		);
 	};
 };
 
 HandlebarsWax.prototype.engine = function (file, data, callback) {
-	const config = this.config;
+	const {config} = this;
 	const cache = this.cache || (this.cache = {});
 
 	try {
 		let template = cache[file];
 
-		// istanbul ignore else
 		if (!template || config.bustCache) {
 			template = this.compile(fs.readFileSync(file, 'utf8'));
 			cache[file] = template;
 		}
 
 		callback(null, template(data));
-	} catch (err) {
-		// istanbul ignore next
-		callback(err);
+	} catch (error) {
+		callback(error);
 	}
 
 	return this;
 };
 
-// API
-
-function handlebarsWax(handlebars, config) {
-	return new HandlebarsWax(handlebars, config);
+module.exports = function handlebarsWax(handlebars, config) {
+    return new HandlebarsWax(handlebars, config);
 }
 
-module.exports = handlebarsWax;
-module.exports.HandlebarsWax = HandlebarsWax;
+handlebarsWax.HandlebarsWax = HandlebarsWax;
