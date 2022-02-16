@@ -51,7 +51,7 @@ function keygenPartial(options, file) {
 		= resolvedFileBase.replace(PATH_SEPARATORS, PATH_SEPARATOR)
 		+ PATH_SEPARATOR;
 	const shortPath = fullPath.replace(
-		new RegExp('^' + string_.replace(ESCAPE_CHARACTERS, '\\$&'), 'i'),
+		new RegExp('^' + basePath.replace(ESCAPE_CHARACTERS, '\\$&'), 'i'),
 		'',
 	);
 	const extension = path.extname(shortPath);
