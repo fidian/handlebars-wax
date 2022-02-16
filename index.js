@@ -244,4 +244,4 @@ module.exports = function handlebarsWax(handlebars, config) {
     return new HandlebarsWax(handlebars, config);
 }
 
-handlebarsWax.HandlebarsWax = HandlebarsWax;
+module.exports.HandlebarsWax = HandlebarsWax;
