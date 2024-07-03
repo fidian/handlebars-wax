@@ -1,6 +1,6 @@
 {
   "name": "@fidian/handlebars-wax",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "description": "Effortless wiring of Handlebars data, partials, helpers, and decorators.",
   "main": "index.js",
   "files": [
