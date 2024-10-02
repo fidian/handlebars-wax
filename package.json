@@ -1,22 +1,23 @@
 {
-  "name": "@fidian/handlebars-wax",
-  "version": "7.2.2",
-  "description": "Effortless wiring of Handlebars data, partials, helpers, and decorators.",
-  "main": "index.js",
-  "files": [
-    "*.js"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fidian/handlebars-wax.git"
-  },
-  "author": "Shannon Moeller <me@shannonmoeller.com> (http://shannonmoeller.com)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/fidian/handlebars-wax/issues"
-  },
-  "homepage": "https://github.com/fidian/handlebars-wax",
-  "dependencies": {
-    "require-glob": "^4.1.0"
-  }
+    "name": "@fidian/handlebars-wax",
+    "version": "7.2.2",
+    "description": "Effortless wiring of Handlebars data, partials, helpers, and decorators.",
+    "scripts": {
+        "reinstall": "rm -rf node_modules package-lock.json && npm install"
+    },
+    "main": "index.js",
+    "files": ["*.js"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fidian/handlebars-wax.git"
+    },
+    "author": "Shannon Moeller <me@shannonmoeller.com> (http://shannonmoeller.com)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/fidian/handlebars-wax/issues"
+    },
+    "homepage": "https://github.com/fidian/handlebars-wax",
+    "dependencies": {
+        "require-glob": "^4.1.0"
+    }
 }
