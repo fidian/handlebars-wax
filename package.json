@@ -1,6 +1,6 @@
 {
     "name": "@fidian/handlebars-wax",
-    "version": "7.3.0",
+    "version": "7.4.0",
     "description": "Effortless wiring of Handlebars data, partials, helpers, and decorators.",
     "scripts": {
         "reinstall": "rm -rf node_modules package-lock.json && npm install"
